@@ -44,6 +44,9 @@ Options:
 --subject   - the email subject line
 
 --smtpHost  - the SMTP server's hostname or address (defaults to 'localhost')
+--smtpUser  - the SMTP server's username (default is to not use user/password)
+--smtpPass  - the SMTP server's password (default is to not use user/password)
+--smtpTLS   - whether to use TLS mode for SMTP (default false)
 
 A sample invocation:
 

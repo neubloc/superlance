@@ -43,6 +43,12 @@ class ProcessStateEmailMonitor(ProcessStateMonitor):
                           help="email subject")
         parser.add_option("-H", "--smtpHost", dest="smtp_host", default="localhost",
                           help="SMTP server hostname or address")
+        parser.add_option("-U", "--smtpUser", dest="smtp_user", default="localhost",
+                          help="SMTP server username")
+        parser.add_option("-P", "--smtpPass", dest="smtp_pass", default="localhost",
+                          help="SMTP server password")
+        parser.add_option("-T", "--smtpTLS", action="store_true", dest="smtp_tls",
+                          help="enable TLS mode for SMTP")
         parser.add_option("-e", "--tickEvent", dest="eventname", default="TICK_60",
                           help="TICK event name (defaults to TICK_60)")
         
@@ -68,6 +74,9 @@ class ProcessStateEmailMonitor(ProcessStateMonitor):
         self.to_email = kwargs['to_email']
         self.subject = kwargs.get('subject')
         self.smtp_host = kwargs.get('smtp_host', 'localhost')
+        self.smtp_user = kwargs.get('smtp_user')
+        self.smtp_pass = kwargs.get('smtp_pass')
+        self.smtp_tls = kwargs.get('smtp_tls')
         self.digest_len = 76
 
     def send_batch_notification(self):
@@ -108,6 +117,10 @@ From: %(from)s\nSubject: %(subject)s\nBody:\n%(body)s\n" % email_for_log)
     def send_smtp(self, mimeMsg):
         s = smtplib.SMTP(self.smtp_host)
         try:
+            if self.smtp_tls:
+                s.starttls()
+            if self.smtp_user and self.smtp_pass:
+                s.login(self.smtp_user, self.smtp_pass)
             s.sendmail(mimeMsg['From'], [mimeMsg['To']], mimeMsg.as_string())
         except:
             s.quit()
